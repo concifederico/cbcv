@@ -69,7 +69,6 @@ def closest_node(node, nodes):
 
 def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefiltro, laterali, laterals, anchobanda, seltiempo, Objeto, calib, TRefresh, Texto, Graficos,AdvOverlay):
 
-    import config
     import math
     flagorden = False
 

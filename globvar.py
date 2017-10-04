@@ -8,6 +8,8 @@ VideoWebCam = False
 global TimerStatus
 TimerStatus = False
 
+global size
+
 global cuadro
 cuadro = 0
 global tic

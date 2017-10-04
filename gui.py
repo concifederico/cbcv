@@ -37,7 +37,9 @@ def str2bool(v):
 class wxVideoFrame(wx.Frame):
     def __init__(self, *args, **kwds):
         # begin wxGlade: wxVideoFrame.__init__
+        style = (wx.DEFAULT_FRAME_STYLE | wx.MAXIMIZE) & ~ (wx.RESIZE_BORDER | wx.MINIMIZE_BOX)
         wx.Frame.__init__(self, *args, **kwds)
+        #self.ShowFullScreen(True)
         self.window_1 = wx.SplitterWindow(self, wx.ID_ANY)
         self.window_1_pane_1 = wx.Panel(self.window_1, wx.ID_ANY)
         self.m_panelVideo = wx.Panel(self.window_1_pane_1, wx.ID_ANY)
@@ -147,7 +149,7 @@ class wxVideoFrame(wx.Frame):
         self.checkbox_AdvOverlay = wx.CheckBox(self.notebook_7_pane_3, wx.ID_ANY, "Ayudas visuales (Reducen rendimiento)")  # Settings 22
 
         self.notebook_5_pane_3 = wx.Panel(self.notebook_5, wx.ID_ANY)
-        self.label_9 = wx.StaticText(self.notebook_5_pane_3, wx.ID_ANY, "Udyat v1\n\n 2017 - Federico S. Conci")
+        self.label_9 = wx.StaticText(self.notebook_5_pane_3, wx.ID_ANY, "cbcv v1\n\n 2017 - Federico S. Conci")
         #self.notebook_21 = wx.Notebook(self.window_1_pane_2, wx.ID_ANY)
         self.notebook_5_pane_4 = wx.Panel(self.notebook_5, wx.ID_ANY)
         #self.label_10 = wx.StaticText(self.notebook_21_pane_1, wx.ID_ANY, "label_12")
@@ -269,7 +271,7 @@ class wxVideoFrame(wx.Frame):
 
     def __set_properties(self):
         # begin wxGlade: wxVideoFrame.__set_properties
-        self.SetTitle("Udyat v1")
+        self.SetTitle("cbcv v1")
         self.SetSize((1, 1))
         self.SetFocus()
         #self.m_panelVideo.SetMinSize((1605, 720))
@@ -315,7 +317,7 @@ class wxVideoFrame(wx.Frame):
     def __do_layout(self):
 
         icon = wx.EmptyIcon()
-        icon.CopyFromBitmap(wx.Bitmap("udyat.png", wx.BITMAP_TYPE_ANY))
+        icon.CopyFromBitmap(wx.Bitmap("cbcv.png", wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
 
         # begin wxGlade: wxVideoFrame.__do_layout
@@ -338,7 +340,7 @@ class wxVideoFrame(wx.Frame):
         sizer_10 = wx.BoxSizer(wx.VERTICAL)
         grid_sizer_2 = wx.GridSizer(12, 2, 0, 0)
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2.Add(self.m_panelVideo, 1, 0, 0)
+        sizer_2.Add(self.m_panelVideo, 1, wx.EXPAND, 0)
         self.window_1_pane_1.SetSizer(sizer_2)
 
         grid_sizer_2.Add(self.button_inicio, 0, wx.EXPAND, 0)

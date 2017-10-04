@@ -119,7 +119,7 @@ def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefi
             if globvar.Produciendo == False:
                 globvar.Produciendo = True
 
-                with open(os.path.realpath(__file__)[:-len(os.path.basename(os.path.realpath(__file__)))] + "Detenciones.csv",
+                with open(os.path.realpath(__file__)[:-len(os.path.basename(os.path.realpath(__file__)))] + "Log.csv",
                           "a") as f:
                     writer = csv.writer(f)
                     fields = [str(datetime.now().replace(microsecond=0)), "Largando"]
@@ -135,7 +135,7 @@ def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefi
             if globvar.Produciendo == True:
                 globvar.Produciendo = False
 
-                with open(os.path.realpath(__file__)[:-len(os.path.basename(os.path.realpath(__file__)))] + "Detenciones.csv",
+                with open(os.path.realpath(__file__)[:-len(os.path.basename(os.path.realpath(__file__)))] + "Log.csv",
                           "a") as f:
                     writer = csv.writer(f)
                     fields = [str(datetime.now().replace(microsecond=0)), "Cortando"]

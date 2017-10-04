@@ -29,6 +29,7 @@ class VideoFrame(gui.wxVideoFrame):
         self.parent = parent
         gui.wxVideoFrame.__init__(self, parent)
         ww, hw = self.m_panelVideo.GetSize()
+        globvar.size = self.GetSize()
         if globvar.VideoWebCam == True:
             """ Create the webcam feed/openCV object  """
             self.webcam = WebcamFeed()
@@ -48,8 +49,10 @@ class VideoFrame(gui.wxVideoFrame):
                 globvar.iniciovideo = True
         #if globvar.iniciovideo == True:
 
-        self.m_panelVideo.SetSize((int(hw / float(h) * w), hw))
-        self.window_1.SplitVertically(self.window_1_pane_1, self.window_1_pane_2, int(hw / float(h) * w))
+        self.window_1_pane_1.SetMinSize((hw/float(h)*w,hw))
+
+        #self.m_panelVideo.SetSize((int(hw / float(h) * w), hw))
+        #self.window_1.SplitVertically(self.window_1_pane_1, self.window_1_pane_2, int(hw / float(h) * w))
 
         #self.SetSize(wx.Size(w, h))
 
@@ -360,11 +363,18 @@ class VideoFrame(gui.wxVideoFrame):
 
             h, w = frame.shape[:2]
             ww,hw = self.window_1_pane_1.GetSize()
-            self.m_panelVideo.SetSize((int(hw/float(h)*w),hw))
-            self.window_1_pane_1.SetMinSize((int(hw/float(h)*w),hw))
 
 
-            h1,w1 = self.window_1_pane_1.GetSize()
+            if self.GetSize() <> globvar.size:
+                globvar.size = self.GetSize()
+                self.window_1_pane_1.SetMinSize((hw/float(h)*w, hw))
+                self.Fit()
+
+            self.m_panelVideo.SetSize((ww,ww*float(h)/w))
+            #self.window_1_pane_1.SetSize((int(hw/float(h)*w),hw))
+
+
+            h1,w1 = self.m_panelVideo.GetSize()
 
             if h >0 and w > 0:
                 frame = cv2.resize(frame, (h1,w1))

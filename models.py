@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 import gui
-import globals
+import globvar
 """
 An example class of how to implement openCV and how it can communicate with the
 wxPython layer.

@@ -248,6 +248,7 @@ class VideoFrame(gui.wxVideoFrame):
                     self.canvas_sd.draw()
 
                     # Plot Fracciones
+
                     self.axes_st.clear()
 
                     self.axes_st.stackplot(globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['Fecha'].astype(datetime), 100 - globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LIE'] - globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LSE'], globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LIE'], globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LSE'], colors=['g','orange','r'], labels=['OK','<LIE','>LSE'])

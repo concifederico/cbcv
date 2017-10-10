@@ -3,6 +3,8 @@ import globvar
 
 cuadro = 0
 
+globvar.init()
+
 from frames import VideoFrame
 
 """ Standard way of starting a wxPython app """

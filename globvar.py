@@ -33,6 +33,8 @@ def init():
     global TSi #Index
     TSi = 0
 
+    global maxgraph
+    maxgraph = 500
     global Tiempo
     Tiempo = 0
     global nGalleta

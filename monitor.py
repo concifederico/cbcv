@@ -107,6 +107,8 @@ def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefi
     if globvar.Tiempo + TRefresh <= time.clock():
         globvar.Tiempo = time.clock()
 
+        globvar.flaghist = True
+
         if globvar.DMedidoC > 0 :
             globvar.AMedido = globvar.AMedidoS / globvar.DMedidoC
             globvar.DMedido = globvar.DMedidoS / globvar.DMedidoC
@@ -115,7 +117,7 @@ def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefi
 
             globvar.filas[1:numfilas+1] = globvar.filasS[1:numfilas+1] / globvar.filasC[1:numfilas+1]
 
-            globvar.flaghist = True
+
 
             if globvar.Produciendo == False:
                 globvar.Produciendo = True

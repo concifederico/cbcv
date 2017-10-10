@@ -122,9 +122,12 @@ class VideoFrame(gui.wxVideoFrame):
                         pLSE = (globvar.LMedidoA > globvar.LSE).sum() / float((globvar.LMedidoA > 0).sum()) * 100
                         pLIE =  (globvar.LMedidoA < globvar.LIE).sum() / float((globvar.LMedidoA > 0).sum()) * 100
                         pOK = 100 - pLSE - pLIE
+
+                        self.label_FPS.LabelText = "{:.1f}".format(globvar.FFPS / globvar.TFPS)
+
                     else:
                         pLSE = 0
-                        pLIE = 0
+                        pLIE = 100
                         pOK = 0
 
                     self.label_diametrolse.LabelText = "{:.0f}".format(pLSE) + "%"
@@ -225,7 +228,7 @@ class VideoFrame(gui.wxVideoFrame):
                     else:
                         self.label_largo.SetForegroundColour(wx.Colour(0, 127, 0))
 
-                    self.label_FPS.LabelText = "{:.1f}".format(globvar.FFPS/globvar.TFPS)
+
 
                     self.label_diferencia.LabelText = "{:.1f}".format(diferencia)
 
@@ -234,8 +237,8 @@ class VideoFrame(gui.wxVideoFrame):
                     # Plot Diametro
                     self.axes_sd.clear()
 
-                    self.axes_sd.plot(globvar.TS[0:globvar.TSi]['Fecha'].astype(datetime), globvar.TS[0:globvar.TSi]['Diametro'], label='Diametro')
-                    self.axes_sd.plot(globvar.TS[0:globvar.TSi]['Fecha'].astype(datetime), globvar.TS[0:globvar.TSi]['Largo'], label='Largo')
+                    self.axes_sd.plot(globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Fecha'].astype(datetime), globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Diametro'], label='Diametro')
+                    self.axes_sd.plot(globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Fecha'].astype(datetime), globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Largo'], label='Largo')
                     self.axes_sd.legend(framealpha=0.5)
                     self.axes_sd.set_xlabel('Hora')
                     self.axes_sd.set_ylabel('Diametro (mm)')
@@ -251,7 +254,7 @@ class VideoFrame(gui.wxVideoFrame):
 
                     self.axes_st.clear()
 
-                    self.axes_st.stackplot(globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['Fecha'].astype(datetime), 100 - globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LIE'] - globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LSE'], globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LIE'], globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LSE'], colors=['g','orange','r'], labels=['OK','<LIE','>LSE'])
+                    self.axes_st.stackplot(globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Fecha'].astype(datetime), 100 - globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['LIE'] - globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['LSE'], globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['LIE'], globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['LSE'], colors=['g','orange','r'], labels=['OK','<LIE','>LSE'])
                     self.axes_st.legend(framealpha=0.5)
                     self.axes_st.set_xlabel('Hora')
                     self.axes_st.set_ylabel('Fraccion %')
@@ -318,35 +321,20 @@ class VideoFrame(gui.wxVideoFrame):
 
                     self.canvas_f.draw()
 
-                    self.axes_f.clear()
-                    globvar.filas = np.nan_to_num(globvar.filas)
-                    barras = self.axes_f.bar(np.arange(self.spin_ctrl_filas.GetValue()),
-                                             globvar.filas[1:self.spin_ctrl_filas.GetValue() + 1], 0.75, color='r')
-                    self.axes_f.set_xlabel('Filas')
-                    self.axes_f.set_ylabel('Diametro (mm)')
-                    self.axes_f.set_title(r'Diametro - Filas')
+                    # Plot Detenciones
+                    self.axes_det.clear()
 
-                    self.canvas_f.draw()
-
-                    # Bar Filas
-                    self.axes_f.clear()
-                    globvar.filas = np.nan_to_num(globvar.filas)
-                    barras = self.axes_f.bar(np.arange(self.spin_ctrl_filas.GetValue()), globvar.filas[1:self.spin_ctrl_filas.GetValue()+1], 0.75, color='r')
-                    self.axes_f.set_xlabel('Filas')
-                    self.axes_f.set_ylabel('Diametro (mm)')
-                    self.axes_f.set_title(r'Diametro - Filas')
-
-                    self.canvas_f.draw()
-
-                    self.axes_f.clear()
-                    globvar.filas = np.nan_to_num(globvar.filas)
-                    barras = self.axes_f.bar(np.arange(self.spin_ctrl_filas.GetValue()),
-                                             globvar.filas[1:self.spin_ctrl_filas.GetValue() + 1], 0.75, color='r')
-                    self.axes_f.set_xlabel('Filas')
-                    self.axes_f.set_ylabel('Diametro (mm)')
-                    self.axes_f.set_title(r'Diametro - Filas')
-
-                    self.canvas_f.draw()
+                    self.axes_det.plot(globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Fecha'].astype(datetime),
+                                      globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Produciendo'], label='Detenciones')
+                    self.axes_det.legend(framealpha=0.5)
+                    self.axes_det.set_xlabel('Hora')
+                    self.axes_det.set_ylabel('Produciendo')
+                    self.axes_det.set_title('Detenciones - Tiempo')
+                    self.axes_det.autoscale(enable=True, axis='y')
+                    #
+                    for tick in self.axes_det.get_xticklabels():
+                        tick.set_rotation(45)
+                    self.canvas_det.draw()
 
                     globvar.AMedidoS = 0
                     globvar.DifMedidoS = 0

@@ -163,6 +163,7 @@ class wxVideoFrame(wx.Frame):
         self.notebook_5_pane_6 = wx.Panel(self.notebook_5, wx.ID_ANY)
         self.notebook_5_pane_7 = wx.Panel(self.notebook_5, wx.ID_ANY)
         self.notebook_5_pane_8 = wx.Panel(self.notebook_5, wx.ID_ANY)
+        self.notebook_5_pane_9 = wx.Panel(self.notebook_5, wx.ID_ANY)
 
         if os.path.isfile(os.path.realpath(__file__)[
                           :-len(os.path.basename(os.path.realpath(__file__)))] + "settings.ini") == True:
@@ -343,6 +344,7 @@ class wxVideoFrame(wx.Frame):
         sizer_l = wx.BoxSizer(wx.VERTICAL)
         sizer_sd = wx.BoxSizer(wx.VERTICAL)
         sizer_st = wx.BoxSizer(wx.VERTICAL)
+        sizer_det = wx.BoxSizer(wx.VERTICAL)
         grid_sizer_4 = wx.GridSizer(8, 2, 0, 0)
         grid_sizer_1 = wx.GridSizer(9, 2, 0, 0)
         grid_sizer_3 = wx.GridSizer(10, 2, 0, 0)
@@ -450,6 +452,7 @@ class wxVideoFrame(wx.Frame):
         self.notebook_5_pane_6.SetSizer(sizer_f)
         self.notebook_5_pane_7.SetSizer(sizer_sd)
         self.notebook_5_pane_8.SetSizer(sizer_st)
+        self.notebook_5_pane_9.SetSizer(sizer_det)
 
         self.figure_l = Figure()
         self.axes_l = self.figure_l.add_subplot(111)
@@ -491,12 +494,21 @@ class wxVideoFrame(wx.Frame):
         sizer_st.Add(self.st_toolbar, 0, wx.LEFT | wx.EXPAND)
         self.st_toolbar.update()
 
+        self.figure_det = Figure()
+        self.axes_det = self.figure_det.add_subplot(111)
+        self.canvas_det = FigureCanvas(self.notebook_5_pane_9, 0, self.figure_det)
+        self.det_toolbar = NavigationToolbar(self.canvas_det)  # createa navigation toolbar for our plot canvas
+        self.det_toolbar.Realize()
+        sizer_det.Add(self.det_toolbar, 0, wx.LEFT | wx.EXPAND)
+        self.det_toolbar.update()
+
         self.notebook_5.AddPage(self.notebook_5_pane_7, u"Serie de tiempo - Di\u00e1metro")
         self.notebook_5.AddPage(self.notebook_5_pane_8, "Serie de tiempo - Tolerancias")
 
         self.notebook_5.AddPage(self.notebook_5_pane_4, "Histograma - Largo")
         self.notebook_5.AddPage(self.notebook_5_pane_5, u"Histograma - Di\u00e1metro")
         self.notebook_5.AddPage(self.notebook_5_pane_6, "Filas")
+        self.notebook_5.AddPage(self.notebook_5_pane_9, "Detenciones")
         self.notebook_5.AddPage(self.notebook_5_pane_3, "Acerca de...")
 
         sizer_l.Add(self.canvas_l,  proportion=1, flag=wx.LEFT | wx.TOP | wx.GROW)
@@ -504,6 +516,7 @@ class wxVideoFrame(wx.Frame):
         sizer_f.Add(self.canvas_f, proportion=1, flag=wx.LEFT | wx.TOP | wx.GROW)
         sizer_sd.Add(self.canvas_sd, proportion=1, flag=wx.LEFT | wx.TOP | wx.GROW)
         sizer_st.Add(self.canvas_st, proportion=1, flag=wx.LEFT | wx.TOP | wx.GROW)
+        sizer_det.Add(self.canvas_det, proportion=1, flag=wx.LEFT | wx.TOP | wx.GROW)
 
         #sizer_3.Add(self.notebook_21, 1, wx.EXPAND, 0)
 

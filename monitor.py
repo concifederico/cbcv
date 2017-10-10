@@ -19,6 +19,7 @@ import time
 import os
 import csv
 import globvar
+import gui
 
 from datetime import datetime
 

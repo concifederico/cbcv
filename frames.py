@@ -4,6 +4,7 @@ from __future__ import division
 
 import wx
 import gui
+#from globvar import *
 import globvar
 import numpy as np
 import matplotlib.pyplot as plt
@@ -146,14 +147,11 @@ class VideoFrame(gui.wxVideoFrame):
                     
                     '''
 
-                    globvar.TS[globvar.TSi, 0] = datetime.now().replace(microsecond=0)
-                    globvar.TS[globvar.TSi, 1] = self.combo_box_Objeto.GetValue()[:-1]
-                    globvar.TS[globvar.TSi, 2] = globvar.LMedido
-                    globvar.TS[globvar.TSi, 3] = globvar.DMedido
-                    globvar.TS[globvar.TSi, 4] = pLIE
-                    globvar.TS[globvar.TSi, 5] = pLSE
-                    globvar.TS[globvar.TSi, 6] = globvar.Produciendo
+                    globvar.TS[globvar.TSi] = (datetime.now().replace(microsecond=0), self.combo_box_Objeto.GetValue()[:-1], globvar.LMedido, globvar.DMedido, pLIE, pLSE, globvar.Produciendo)
                     globvar.TSi = globvar.TSi + 1
+
+                    gui.SaveSettings(self)
+                    np.savetxt(os.path.realpath(__file__)[:-len(os.path.basename(os.path.realpath(__file__)))] + "TS.db", globvar.TS, fmt='%19s,%10s,%5.3f,%5.3f,%5.3f,%5.3f,%1i', delimiter=',', newline='\n')
 
                     '''
                             Campos
@@ -197,7 +195,7 @@ class VideoFrame(gui.wxVideoFrame):
 
                     #csv = csv[(csv[:,1] == self.combo_box_Objeto.GetValue())]
 
-                    with open(os.path.realpath(__file__)[:-len(os.path.basename(os.path.realpath(__file__)))] + "dbh.csv", "rb") as f:
+                    '''with open(os.path.realpath(__file__)[:-len(os.path.basename(os.path.realpath(__file__)))] + "dbh.csv", "rb") as f:
                         data_iter = csv.reader(f, delimiter=",",quotechar='"')
                         data = [data for data in data_iter]
                     f.close
@@ -205,6 +203,9 @@ class VideoFrame(gui.wxVideoFrame):
                     data_array = np.asarray(data)
 
                     data_array[:,2] = self.combo_box_Objeto.GetValue()
+                    '''
+
+
 
                     self.label_diametro.LabelText = "{:.1f}".format(diametro)
 
@@ -233,8 +234,8 @@ class VideoFrame(gui.wxVideoFrame):
                     # Plot Diametro
                     self.axes_sd.clear()
 
-                    self.axes_sd.plot(globvar.TS[0:globvar.TSi, 0].astype(datetime), globvar.TS[0:globvar.TSi, 3].astype(float), label='Diametro')
-                    self.axes_sd.plot(globvar.TS[0:globvar.TSi, 0].astype(datetime), globvar.TS[0:globvar.TSi, 2].astype(float), label='Largo')
+                    self.axes_sd.plot(globvar.TS[0:globvar.TSi]['Fecha'].astype(datetime), globvar.TS[0:globvar.TSi]['Diametro'], label='Diametro')
+                    self.axes_sd.plot(globvar.TS[0:globvar.TSi]['Fecha'].astype(datetime), globvar.TS[0:globvar.TSi]['Largo'], label='Largo')
                     self.axes_sd.legend(framealpha=0.5)
                     self.axes_sd.set_xlabel('Hora')
                     self.axes_sd.set_ylabel('Diametro (mm)')
@@ -247,9 +248,10 @@ class VideoFrame(gui.wxVideoFrame):
                     self.canvas_sd.draw()
 
                     # Plot Fracciones
+
                     self.axes_st.clear()
 
-                    self.axes_st.stackplot(globvar.TS[0:globvar.TSi, 0].astype(datetime), 100 - globvar.TS[0:globvar.TSi, 4].astype(float) - globvar.TS[0:globvar.TSi, 5].astype(float), globvar.TS[0:globvar.TSi, 4].astype(float), globvar.TS[0:globvar.TSi, 5].astype(float), colors=['g','orange','r'], labels=['OK','<LIE','>LSE'])
+                    self.axes_st.stackplot(globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['Fecha'].astype(datetime), 100 - globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LIE'] - globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LSE'], globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LIE'], globvar.TS[max(0,globvar.TSi-200):globvar.TSi]['LSE'], colors=['g','orange','r'], labels=['OK','<LIE','>LSE'])
                     self.axes_st.legend(framealpha=0.5)
                     self.axes_st.set_xlabel('Hora')
                     self.axes_st.set_ylabel('Fraccion %')

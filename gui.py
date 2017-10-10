@@ -8,7 +8,7 @@ import wx
 import csv
 import os.path
 import numpy as np
-
+import datetime
 
 from numpy import arange, sin, pi
 import matplotlib
@@ -19,6 +19,7 @@ matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx as NavigationToolbar, wxc
 from matplotlib.figure import Figure
+from matplotlib.dates import strpdate2num
 
 import wx.lib.mixins.inspection as WIT
 
@@ -28,13 +29,18 @@ import wx.lib.mixins.inspection as WIT
 # begin wxGlade: extracode
 # end wxGlade
 
-
+global s
 
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
+def datestr2num(s):
+    return datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%S')
 
 class wxVideoFrame(wx.Frame):
+
+    global s
+
     def __init__(self, *args, **kwds):
         # begin wxGlade: wxVideoFrame.__init__
         style = (wx.DEFAULT_FRAME_STYLE | wx.MAXIMIZE) & ~ (wx.RESIZE_BORDER | wx.MINIMIZE_BOX)
@@ -225,6 +231,10 @@ class wxVideoFrame(wx.Frame):
             self.slider_calib.SetValue(int(sf.readline()[:-1]))  # Settings 23
             globvar.TSi = int(sf.readline()[:-1]) # Settings 24
             sf.close()
+
+            if os.path.isfile(os.path.realpath(__file__)[
+                          :-len(os.path.basename(os.path.realpath(__file__)))] + "TS.db") == True:
+                globvar.TS = np.loadtxt(os.path.realpath(__file__)[:-len(os.path.basename(os.path.realpath(__file__)))] + "TS.db", converters= {0:datestr2num}, delimiter=',', dtype=[('Fecha','datetime64[s]'), ('Objeto','S10'), ('Largo','float'), ('Diametro','float'), ('LIE','float'), ('LSE','float'), ('Produciendo','int')])
 
             #self.notebook_21.SetMinSize((600, 400))
 
@@ -444,42 +454,42 @@ class wxVideoFrame(wx.Frame):
         self.figure_l = Figure()
         self.axes_l = self.figure_l.add_subplot(111)
         self.canvas_l = FigureCanvas(self.notebook_5_pane_4, 0, self.figure_l)
-        #self.l_toolbar = NavigationToolbar(self.canvas_l)  # createa navigation toolbar for our plot canvas
-        #self.l_toolbar.Realize()
-        #sizer_l.Add(self.l_toolbar, 0, wx.LEFT | wx.EXPAND)
-        #self.l_toolbar.update()
+        self.l_toolbar = NavigationToolbar(self.canvas_l)  # createa navigation toolbar for our plot canvas
+        self.l_toolbar.Realize()
+        sizer_l.Add(self.l_toolbar, 0, wx.LEFT | wx.EXPAND)
+        self.l_toolbar.update()
 
         self.figure_d = Figure()
         self.axes_d = self.figure_d.add_subplot(111)
         self.canvas_d = FigureCanvas(self.notebook_5_pane_5, 0, self.figure_d)
-        #self.d_toolbar = NavigationToolbar(self.canvas_d)  # createa navigation toolbar for our plot canvas
-        #self.d_toolbar.Realize()
-        #sizer_d.Add(self.d_toolbar, 0, wx.LEFT | wx.EXPAND)
-        #self.d_toolbar.update()
+        self.d_toolbar = NavigationToolbar(self.canvas_d)  # createa navigation toolbar for our plot canvas
+        self.d_toolbar.Realize()
+        sizer_d.Add(self.d_toolbar, 0, wx.LEFT | wx.EXPAND)
+        self.d_toolbar.update()
 
         self.figure_f = Figure()
         self.axes_f = self.figure_f.add_subplot(111)
         self.canvas_f = FigureCanvas(self.notebook_5_pane_6, 0, self.figure_f)
-        #self.f_toolbar = NavigationToolbar(self.canvas_f)  # createa navigation toolbar for our plot canvas
-        #self.f_toolbar.Realize()
-        #sizer_f.Add(self.f_toolbar, 0, wx.LEFT | wx.EXPAND)
-        #self.f_toolbar.update()
+        self.f_toolbar = NavigationToolbar(self.canvas_f)  # createa navigation toolbar for our plot canvas
+        self.f_toolbar.Realize()
+        sizer_f.Add(self.f_toolbar, 0, wx.LEFT | wx.EXPAND)
+        self.f_toolbar.update()
 
         self.figure_sd = Figure()
         self.axes_sd = self.figure_sd.add_subplot(111)
         self.canvas_sd = FigureCanvas(self.notebook_5_pane_7, 0, self.figure_sd)
-        #self.sd_toolbar = NavigationToolbar(self.canvas_sd)  # createa navigation toolbar for our plot canvas
-        #self.sd_toolbar.Realize()
-        #sizer_sd.Add(self.sd_toolbar, 0, wx.LEFT | wx.EXPAND)
-        #self.sd_toolbar.update()
+        self.sd_toolbar = NavigationToolbar(self.canvas_sd)  # createa navigation toolbar for our plot canvas
+        self.sd_toolbar.Realize()
+        sizer_sd.Add(self.sd_toolbar, 0, wx.LEFT | wx.EXPAND)
+        self.sd_toolbar.update()
 
         self.figure_st = Figure()
         self.axes_st = self.figure_st.add_subplot(111)
         self.canvas_st = FigureCanvas(self.notebook_5_pane_8, 0, self.figure_st)
-        #self.st_toolbar = NavigationToolbar(self.canvas_st)  # createa navigation toolbar for our plot canvas
-        #self.st_toolbar.Realize()
-        #sizer_st.Add(self.st_toolbar, 0, wx.LEFT | wx.EXPAND)
-        #self.st_toolbar.update()
+        self.st_toolbar = NavigationToolbar(self.canvas_st)  # createa navigation toolbar for our plot canvas
+        self.st_toolbar.Realize()
+        sizer_st.Add(self.st_toolbar, 0, wx.LEFT | wx.EXPAND)
+        self.st_toolbar.update()
 
         self.notebook_5.AddPage(self.notebook_5_pane_7, u"Serie de tiempo - Di\u00e1metro")
         self.notebook_5.AddPage(self.notebook_5_pane_8, "Serie de tiempo - Tolerancias")
@@ -743,3 +753,4 @@ def SaveSettings(self):
     text_file.write(str(self.slider_calib.GetValue()).encode('utf-8') + '\n')  # Settings 23
     text_file.write(str(globvar.TSi) + '\n')  # Settings 24
     text_file.close()
+

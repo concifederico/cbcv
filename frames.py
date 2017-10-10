@@ -13,7 +13,7 @@ import imutils
 import csv
 import os
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from monitor import analizar
 
@@ -150,7 +150,7 @@ class VideoFrame(gui.wxVideoFrame):
                     
                     '''
 
-                    globvar.TS[globvar.TSi] = (datetime.now().replace(microsecond=0), self.combo_box_Objeto.GetValue()[:-1], globvar.LMedido, globvar.DMedido, pLIE, pLSE, globvar.Produciendo)
+                    globvar.TS[globvar.TSi] = (datetime.now().replace(microsecond=0), self.combo_box_Objeto.GetValue(), globvar.LMedido, globvar.DMedido, pLIE, pLSE, globvar.Produciendo)
                     globvar.TSi = globvar.TSi + 1
 
                     gui.SaveSettings(self)
@@ -237,8 +237,12 @@ class VideoFrame(gui.wxVideoFrame):
                     # Plot Diametro
                     self.axes_sd.clear()
 
-                    self.axes_sd.plot(globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Fecha'].astype(datetime), globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Diametro'], label='Diametro')
-                    self.axes_sd.plot(globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Fecha'].astype(datetime), globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Largo'], label='Largo')
+                    TSF = globvar.TS[globvar.TS['Fecha']>datetime.now().replace(microsecond=0) - timedelta(minutes=int(globvar.Selmin))]
+
+                    globvar.LTiempos[globvar.LTiempos["Tiempo"] == self.combo_box_tiempo.GetValue()]["min"]
+
+                    self.axes_sd.plot(TSF[:]['Fecha'].astype(datetime), TSF[:]['Diametro'], label='Diametro')
+                    self.axes_sd.plot(TSF[:]['Fecha'].astype(datetime), TSF[:]['Largo'], label='Largo')
                     self.axes_sd.legend(framealpha=0.5)
                     self.axes_sd.set_xlabel('Hora')
                     self.axes_sd.set_ylabel('Diametro (mm)')
@@ -254,7 +258,7 @@ class VideoFrame(gui.wxVideoFrame):
 
                     self.axes_st.clear()
 
-                    self.axes_st.stackplot(globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Fecha'].astype(datetime), 100 - globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['LIE'] - globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['LSE'], globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['LIE'], globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['LSE'], colors=['g','orange','r'], labels=['OK','<LIE','>LSE'])
+                    self.axes_st.stackplot(TSF[:]['Fecha'].astype(datetime), 100 - TSF[:]['LIE'] - TSF[:]['LSE'], TSF[:]['LIE'], TSF[:]['LSE'], colors=['g','orange','r'], labels=['OK','<LIE','>LSE'])
                     self.axes_st.legend(framealpha=0.5)
                     self.axes_st.set_xlabel('Hora')
                     self.axes_st.set_ylabel('Fraccion %')
@@ -324,8 +328,8 @@ class VideoFrame(gui.wxVideoFrame):
                     # Plot Detenciones
                     self.axes_det.clear()
 
-                    self.axes_det.plot(globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Fecha'].astype(datetime),
-                                      globvar.TS[max(0,globvar.TSi-globvar.maxgraph):globvar.TSi]['Produciendo'], label='Detenciones')
+                    self.axes_det.plot(TSF[:]['Fecha'].astype(datetime),
+                                      TSF[:]['Produciendo'], label='Detenciones')
                     self.axes_det.legend(framealpha=0.5)
                     self.axes_det.set_xlabel('Hora')
                     self.axes_det.set_ylabel('Produciendo')

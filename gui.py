@@ -54,7 +54,7 @@ class wxVideoFrame(wx.Frame):
         self.notebook_5_pane_1 = wx.Panel(self.notebook_5, wx.ID_ANY)
         self.button_inicio = wx.ToggleButton(self.notebook_5_pane_1, wx.ID_ANY, "Inicio")
         self.combo_box_tiempo = wx.ComboBox(self.notebook_5_pane_1, wx.ID_ANY,
-                                            choices=['1 min', '5 min', '30 min', '1 h', '4 h', '8 h'],
+                                            choices=globvar.LTiempos["Tiempo"],
                                             style=wx.CB_READONLY | wx.CB_DROPDOWN)  # Settings 1
         self.label_4 = wx.StaticText(self.notebook_5_pane_1, wx.ID_ANY, "Largo (mm)", style=wx.ALIGN_CENTER)
         self.label_largo = wx.StaticText(self.notebook_5_pane_1, wx.ID_ANY, "0.0", style=wx.ALIGN_CENTER)
@@ -119,7 +119,8 @@ class wxVideoFrame(wx.Frame):
                                             "Iniciar medicion al iniciar")  # Settings 10
         self.notebook_7_pane_2 = wx.Panel(self.notebook_7, wx.ID_ANY)
         self.Min_copy_5_copy_1 = wx.StaticText(self.notebook_7_pane_2, wx.ID_ANY, "Objeto")
-        self.combo_box_Objeto = wx.ComboBox(self.notebook_7_pane_2, wx.ID_ANY, choices=["C", "R", "B"],
+
+        self.combo_box_Objeto = wx.ComboBox(self.notebook_7_pane_2, wx.ID_ANY, choices=globvar.Objetos["Objeto"],
                                              style=wx.CB_DROPDOWN | wx.CB_READONLY)  # Settings 11
         self.Min_copy_5 = wx.StaticText(self.notebook_7_pane_2, wx.ID_ANY, "Tonalidad Min")
         self.slider_hmin = wx.Slider(self.notebook_7_pane_2, wx.ID_ANY, 0, 0, 255,
@@ -210,6 +211,9 @@ class wxVideoFrame(wx.Frame):
             self.checkbox_iniciar.SetValue(str2bool(sf.readline()[:-1]))  # Settings 10
 
             self.combo_box_Objeto.SetValue(sf.readline()[:-1])  # Settings 11
+
+
+
             globvar.LIE = 50
             globvar.LSE = 58
 
@@ -321,6 +325,9 @@ class wxVideoFrame(wx.Frame):
             self.combo_box_Objeto.SetSelection(0)
             self.text_ctrl_archivo.Enable(False)
             self.button_2.Enable(False)
+        else:
+            self.EnObjeto(wx.EVT_TOGGLEBUTTON)
+            self.EnComboTiempo(wx.EVT_TOGGLEBUTTON)
 
         self.window_1.SetMinimumPaneSize(30)
         # end wxGlade
@@ -548,8 +555,10 @@ class wxVideoFrame(wx.Frame):
 
     def EnComboTiempo(self, event):  # wxGlade: wxVideoFrame.<event_handler>
         print "Event handler 'EnComboTiempo' not implemented!"
+        globvar.Selmin = globvar.LTiempos[globvar.LTiempos["Tiempo"]==self.combo_box_tiempo.GetValue()]["min"]
         SaveSettings(self)
-        event.Skip()
+        if event <> wx.EVT_TOGGLEBUTTON:
+            event.Skip()
 
     def EnAnchoBanda(self, event):  # wxGlade: wxVideoFrame.<event_handler>
         print "Event handler 'EnAnchoBanda' not implemented!"
@@ -652,11 +661,12 @@ class wxVideoFrame(wx.Frame):
         event.Skip()
 
     def EnObjeto(self, event):  # wxGlade: wxVideoFrame.<event_handler>
-        globvar.LIE = 50
-        globvar.LSE = 58
+        globvar.LIE = globvar.Objetos[globvar.Objetos["Objeto"]==self.combo_box_Objeto.GetValue()]["LIE"]
+        globvar.LSE = globvar.Objetos[globvar.Objetos["Objeto"]==self.combo_box_Objeto.GetValue()]["LSE"]
 
         SaveSettings(self)
-        event.Skip()
+        if event <> wx.EVT_TOGGLEBUTTON:
+            event.Skip()
 
     def EnHMin(self, event):  # wxGlade: wxVideoFrame.<event_handler>
         print "Event handler 'EnHMin' not implemented!"

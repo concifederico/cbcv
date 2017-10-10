@@ -1,6 +1,7 @@
 # globvar.py
 
 import numpy as np
+import os
 
 def init():
 
@@ -30,11 +31,21 @@ def init():
     #TimeSeries
     global TS
     TS = np.empty(100000, dtype=[('Fecha','datetime64[s]'), ('Objeto','S10'), ('Largo','float'), ('Diametro','float'), ('LIE','float'), ('LSE','float'), ('Produciendo','int')])
+    global TSF
+    TSF = TS
+
     global TSi #Index
     TSi = 0
 
-    global maxgraph
-    maxgraph = 500
+    global Objetos
+    global LTiempos
+    global Selmin
+    Selmin = 0
+
+    Objetos = np.loadtxt(os.path.realpath(__file__)[:-len(os.path.basename(os.path.realpath(__file__)))] + "objects.csv", delimiter=',', dtype=[('Objeto','S10'), ('LIE','int'), ('LSE','int'), ('Weight','int')])
+    LTiempos = np.loadtxt(os.path.realpath(__file__)[:-len(os.path.basename(os.path.realpath(__file__)))] + "times.csv", delimiter=',',
+        dtype=[('Tiempo', 'S7'), ('min', 'int')])
+
     global Tiempo
     Tiempo = 0
     global nGalleta

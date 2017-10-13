@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 import imutils
+import time
 import csv
 import os
 
@@ -30,6 +31,7 @@ class VideoFrame(gui.wxVideoFrame):
         self.parent = parent
         gui.wxVideoFrame.__init__(self, parent)
         ww, hw = self.m_panelVideo.GetSize()
+	h,w = 200,200
         globvar.size = self.GetSize()
         if globvar.VideoWebCam == True:
             """ Create the webcam feed/openCV object  """
@@ -114,10 +116,19 @@ class VideoFrame(gui.wxVideoFrame):
             #cv2.rectangle(frame , (50, 25), (100, 50), (0, 0, 255), 15)
 
             if globvar.inicioanalisis == True:
+            
+            	if globvar.Tiempo == 0:
+            	    globvar.Tiempo = datetime.now().replace(microsecond=0)
+            
                 diferencia, largo, diametro, angulo, progreso, frame = analizar(frame, self.slider_hmin.GetValue(),self.slider_hmax.GetValue(),self.slider_smin.GetValue(),self.slider_smax.GetValue(),self.slider_vmin.GetValue(),self.slider_vmax.GetValue(),self.spin_ctrl_filas.GetValue(),self.slider_desperado.GetValue(),self.slider_prefiltro.GetValue(),self.slider_laterali.GetValue(),self.slider_laterals.GetValue(),self.spin_ctrl_anchobanda.GetValue(), self.combo_box_tiempo.GetValue(), self.combo_box_Objeto.GetValue(), self.slider_calib.GetValue(), self.spin_button_display.GetValue(), self.text_ctrl_vidoverlay.GetValue(), self.spin_button_display.GetValue(), self.checkbox_AdvOverlay.GetValue())
                 self.gauge_1.SetValue(int(progreso))
+                
+                if globvar.TS[max(1,globvar.TSi-1)]["Fecha"] < datetime.now().replace(microsecond=0) - timedelta(minutes=5):
+                    print "Problema " + str(datetime.now().replace(microsecond=0)) + " " + str(progreso)
+                
                 if globvar.flaghist == True:
-
+                    print str(datetime.now().replace(microsecond=0)) + " " + str(globvar.Tiempo) + " " + str(time.clock())
+                    
                     if globvar.Produciendo == True:
                         pLSE = (globvar.LMedidoA > globvar.LSE).sum() / float((globvar.LMedidoA > 0).sum()) * 100
                         pLIE =  (globvar.LMedidoA < globvar.LIE).sum() / float((globvar.LMedidoA > 0).sum()) * 100
@@ -208,8 +219,6 @@ class VideoFrame(gui.wxVideoFrame):
                     data_array[:,2] = self.combo_box_Objeto.GetValue()
                     '''
 
-
-
                     self.label_diametro.LabelText = "{:.1f}".format(diametro)
 
                     if diametro < globvar.LIE:
@@ -268,13 +277,13 @@ class VideoFrame(gui.wxVideoFrame):
 
                     self.canvas_st.draw()
 
-                    self.axes_f.clear()
-                    globvar.filas = np.nan_to_num(globvar.filas)
-                    barras = self.axes_f.bar(np.arange(self.spin_ctrl_filas.GetValue()),
-                                             globvar.filas[1:self.spin_ctrl_filas.GetValue() + 1], 0.75, color='r')
-                    self.axes_f.set_xlabel('Filas')
-                    self.axes_f.set_ylabel('Diametro (mm)')
-                    self.axes_f.set_title(r'Diametro - Filas')
+		    if globvar.filas.size > 1:
+                        self.axes_f.clear()
+                        globvar.filas = np.nan_to_num(globvar.filas)
+                        #barras = self.axes_f.bar(np.arange(self.spin_ctrl_filas.GetValue()),globvar.filas[1:self.spin_ctrl_filas.GetValue() + 1], 1, color='r')
+                        self.axes_f.set_xlabel('Filas')
+                        self.axes_f.set_ylabel('Diametro (mm)')
+                        self.axes_f.set_title(r'Diametro - Filas')
 
                     self.canvas_f.draw()
 
@@ -313,17 +322,6 @@ class VideoFrame(gui.wxVideoFrame):
                             patch.set_facecolor('red')
 
                     self.canvas_d.draw()
-
-                    # Bar Filas
-                    self.axes_f.clear()
-                    globvar.filas = np.nan_to_num(globvar.filas)
-                    barras = self.axes_f.bar(np.arange(self.spin_ctrl_filas.GetValue()), globvar.filas[1:self.spin_ctrl_filas.GetValue()+1], 0.75, color='r')
-                    self.axes_f.set_xlabel('Filas')
-                    self.axes_f.set_ylabel('Diametro (mm)')
-                    self.axes_f.set_title(r'Diametro - Filas')
-                    self.axes_f.set_ylim(globvar.LIE / 2, globvar.LSE * 1.5)
-
-                    self.canvas_f.draw()
 
                     # Plot Detenciones
                     self.axes_det.clear()
@@ -378,7 +376,8 @@ class VideoFrame(gui.wxVideoFrame):
                 #self.m_panelVideo.SetSize((405, 720))
             #self.window_1_pane_1.SetSize((h, w))
 
-            image = wx.Bitmap.FromBuffer(w, h, frame)
+	    image2 =  wx.ImageFromBuffer(w, h, frame)
+            image =  wx.BitmapFromImage(image2)
 
             # Use Buffered Painting to avoid flickering
             dc = wx.BufferedPaintDC(self.m_panelVideo)

@@ -48,6 +48,7 @@ def init():
 
     global Tiempo
     Tiempo = 0
+    
     global nGalleta
     nGalleta = 0
     global flagfilas
@@ -96,6 +97,8 @@ def init():
     IniciaralInicio = False
     global Capturar
     Capturar = False
+    global Rescate
+    Rescate = False
 
     global LIE
     global LSE

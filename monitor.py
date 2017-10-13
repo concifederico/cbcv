@@ -21,9 +21,9 @@ import csv
 import globvar
 import gui
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from scipy.spatial import distance as dist
+#from scipy.spatial import distance as dist
 
 import matplotlib
 matplotlib.use('WXAgg')
@@ -68,6 +68,9 @@ def closest_node(node, nodes):
     = 10 columnas de array
     '''
 
+def dist(x,y):  
+    return np.linalg.norm(x-y)
+
 def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefiltro, laterali, laterals, anchobanda, seltiempo, Objeto, calib, TRefresh, Texto, Graficos,AdvOverlay):
 
     import math
@@ -80,11 +83,11 @@ def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefi
     if globvar.cuadro == 0:
         filas = []
         columnas = []
-        tic = time.clock()
+        #tic = time.clock()
 
     globvar.cuadro = globvar.cuadro + 1
 
-    globvar.tic = time.clock()
+    #globvar.tic = time.clock()
 
     height, width = img.shape[:2]
 
@@ -96,16 +99,15 @@ def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefi
     frame_threshed = cv2.inRange(hsv, HSV_MIN, HSV_MAX)
 
     frame_threshed = cv2.dilate(frame_threshed, (100, 100), iterations=2)
+    
+    cnts = np.empty(1)
 
-    cnts = cv2.findContours(frame_threshed, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-
-    hie = cnts[1]
-    cnts = cnts[0]
+    _ , cnts, _ = cv2.findContours(frame_threshed, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
 
     orig = img.copy()
 
-    if globvar.Tiempo + TRefresh <= time.clock():
-        globvar.Tiempo = time.clock()
+    if globvar.Tiempo <= datetime.now().replace(microsecond=0) - timedelta(seconds=TRefresh):
+        globvar.Tiempo = datetime.now().replace(microsecond=0)
 
         globvar.flaghist = True
 
@@ -150,88 +152,93 @@ def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefi
 
     suma = 0
     div = 0
-
-    for c in cnts:
-        if cv2.contourArea(c) > Prefiltro:
-            suma = suma + cv2.contourArea(c)
-            div = div + 1
-    if div > 0:
-        prom = suma / div
-    else:
-        prom = 0
-
-        #fconts = []  # filtrados contornos
-        #fcontsnd = []  # filtrados contornos sin Objetos dobles
-
-    ADimD = 0  # Promedio del diametro
-    d = 0
-
     gec = np.zeros(shape=(400, numfilas))
-    for c in cnts:
+    
+    if len(cnts) > 0:
 
-        # if the contour is not sufficiently large, ignore it
-        if cv2.contourArea(c) > .4 * prom and cv2.contourArea(c) < 4 * prom:
-
-            box = cv2.minAreaRect(c)
-            box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
-            box = np.array(box, dtype="int")
-
-            (tl, tr, br, bl) = box
-            (tltrX, tltrY) = midpoint(tl, tr)
-            (blbrX, blbrY) = midpoint(bl, br)
-            (tlblX, tlblY) = midpoint(tl, bl)
-            (trbrX, trbrY) = midpoint(tr, br)
-
-            # compute the Euclidean distance between the midpoints
-            dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
-            dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
-
-            (cgX, cgY) = midpoint(tl, br)  # centro de la Objeto
-
-            if cgX > DEsperado and (width - cgX) > DEsperado:
-
-                #fconts.append(c)
-                #if dB / dA > 1.75 or dB / dA < 0.75:
-                #    fcontsnd.append(c)
-
-                pixelsPerMetric = anchobanda / float(height - laterali - laterals) * (1 + calib / float(1000))
-
-                # compute the size of the object
-                dimA = dA * pixelsPerMetric
-                dimB = dB * pixelsPerMetric
-
-                gec[d, 0] = cgX
-                gec[d, 1] = cgY
-                gec[d, 2] = math.sqrt(cv2.contourArea(c) / 3.14159) * 2 * pixelsPerMetric
-                gec[d, 6] = True
-                gec[d, 10] = (max(dA,dB)-min(dA,dB))* pixelsPerMetric
-                gec[d, 12] = max(dA, dB) * pixelsPerMetric
-
-                if dA >= dB:
-                    gec[d, 14] = 90 - math.atan(abs((tltrX-blbrX)/(tltrY-blbrY))) / math.pi * 180
-                else:
-                    gec[d, 14] = 90 - math.atan(abs((tlblX-trbrX)/(tlblY-trbrY))) / math.pi * 180
-
-                # gec[d,3] = gec[d:2] + dimD
-                d = d + 1
-
-                # ++++++++++++ Printing +++++++++++++++
-
-                cv2.drawContours(orig, c, -1, (127, 255, 255), 2)
-
-                # draw the midpoints on the img
-                if AdvOverlay == True:
-                    if dA > dB:
-                        cv2.circle(orig, (int(tltrX), int(tltrY)), 2, (255, 0, 255), -1)
-                        cv2.circle(orig, (int(blbrX), int(blbrY)), 2, (255, 0, 255), -1)
-                        cv2.line(orig, (int(tltrX), int(tltrY)), (int(blbrX), int(blbrY)), (0, 0, 255), 2)
-                    else:
-                        cv2.circle(orig, (int(tlblX), int(tlblY)), 2, (255, 0, 255), -1)
-                        cv2.circle(orig, (int(trbrX), int(trbrY)), 2, (255, 0, 255), -1)
-                        cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)), (0, 0, 255), 2)
-
-                # draw the object sizes on the img
-                # cv2.putText(orig, "{:.0f}mm".format(dimD), (int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+	for c in cnts:
+	    if cv2.contourArea(c) > Prefiltro:
+	    
+	        suma = suma + cv2.contourArea(c)
+	        div = div + 1
+	if div > 0:
+	    prom = suma / div
+	else:
+	    prom = 0
+	
+	        #fconts = []  # filtrados contornos
+	        #fcontsnd = []  # filtrados contornos sin Objetos dobles
+	
+	ADimD = 0  # Promedio del diametro
+	d = 0
+	
+	
+	for c in cnts:
+	
+	    # if the contour is not sufficiently large, ignore it
+	    if cv2.contourArea(c) > .4 * prom and cv2.contourArea(c) < 4 * prom:
+	
+	       box = cv2.minAreaRect(c)
+	       box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
+	       box = np.array(box, dtype="int")
+	
+	       (tl, tr, br, bl) = box
+	       (tltrX, tltrY) = midpoint(tl, tr)
+	       (blbrX, blbrY) = midpoint(bl, br)
+	       (tlblX, tlblY) = midpoint(tl, bl)
+	       (trbrX, trbrY) = midpoint(tr, br)
+	
+	       # compute the Euclidean distance between the midpoints
+	       dA = dist(np.array(tltrX, tltrY), np.array(blbrX, blbrY))
+	       dB = dist(np.array(tlblX, tlblY), np.array(trbrX, trbrY))
+	
+	       (cgX, cgY) = midpoint(tl, br)  # centro de la Objeto
+	
+	       if cgX > DEsperado and (width - cgX) > DEsperado:
+	
+	                #fconts.append(c)
+	                #if dB / dA > 1.75 or dB / dA < 0.75:
+	                #    fcontsnd.append(c)
+	
+	            pixelsPerMetric = anchobanda / float(height - laterali - laterals) * (1 + calib / float(1000))
+	
+	                # compute the size of the object
+	            dimA = dA * pixelsPerMetric
+	            dimB = dB * pixelsPerMetric
+	
+	            gec[d, 0] = cgX
+	            gec[d, 1] = cgY
+	            gec[d, 2] = math.sqrt(cv2.contourArea(c) / 3.14159) * 2 * pixelsPerMetric
+	            gec[d, 6] = True
+	            gec[d, 10] = (max(dA,dB)-min(dA,dB))* pixelsPerMetric
+	            gec[d, 12] = max(dA, dB) * pixelsPerMetric
+	
+	            if dA >= dB and abs(tltrY-blbrY) > 0:
+	                gec[d, 14] = 90 - math.atan(abs((tltrX-blbrX)/(tltrY-blbrY))) / float(math.pi) * 180
+	            else:
+	                if (tlblY-trbrY) > 0:
+	                    gec[d, 14] = 90 - math.atan(abs((tlblX-trbrX)/(tlblY-trbrY))) / float(math.pi) * 180
+	
+	                # gec[d,3] = gec[d:2] + dimD
+	            d = d + 1
+	
+	                # ++++++++++++ Printing +++++++++++++++
+	
+	            cv2.drawContours(orig, c, -1, (0, 255, 0), 2)
+	
+	                # draw the midpoints on the img
+	            if AdvOverlay == True:
+	                if dA > dB:
+	                    cv2.circle(orig, (int(tltrX), int(tltrY)), 2, (255, 0, 255), -1)
+	                    cv2.circle(orig, (int(blbrX), int(blbrY)), 2, (255, 0, 255), -1)
+	                    cv2.line(orig, (int(tltrX), int(tltrY)), (int(blbrX), int(blbrY)), (0, 0, 255), 2)
+	                else:
+	                    cv2.circle(orig, (int(tlblX), int(tlblY)), 2, (255, 0, 255), -1)
+	                    cv2.circle(orig, (int(trbrX), int(trbrY)), 2, (255, 0, 255), -1)
+	                    cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)), (0, 0, 255), 2)
+	
+	                # draw the object sizes on the img
+	                # cv2.putText(orig, "{:.0f}mm".format(dimD), (int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
 
     if AdvOverlay == True:
         cv2.putText(orig, Texto, (int(100), int(20)), cv2.FONT_HERSHEY_SIMPLEX, .6, (255, 255, 255), 2)
@@ -310,8 +317,8 @@ def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefi
                     # No ignorar esta Objeto, pero ahora su tracking se perdio y hay que ver porque?
                     if ant[0] > (width - DEsperado * 1.25 ):  # Porque esta saliendo por arriba?
 
-                        if ant[7] == False and ant[4] > 5:
-                            print "Saliendo por borde"
+                        if ant[7] == False and ant[4] > 4:
+                            #print "Saliendo por borde"
                             #globvar.AMedidoS = globvar.AMedidoS + float(ant[9])
                             globvar.DMedidoS = globvar.DMedidoS + ant[3] / float(ant[4])
                             globvar.DMedidoC = globvar.DMedidoC + 1
@@ -338,7 +345,7 @@ def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefi
 
     globvar.gecant = gec
 
-    Progress = ((time.clock()-globvar.Tiempo) / TRefresh)*100
+    Progress = min(max(int((datetime.now().replace(microsecond=0) - globvar.Tiempo).seconds / float(TRefresh) * 100),100),0)
 
     return globvar.DifMedido, globvar.LMedido, globvar.DMedido, globvar.AMedido, Progress, orig
 

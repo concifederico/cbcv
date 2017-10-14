@@ -5,6 +5,13 @@ import os
 
 def init():
 
+    global RPi
+    if os.uname()[1] == 'raspberrypi':
+        RPi = True
+        print "Raspberry pi detectado"
+    else:
+        RPi = False
+
     global VideoWebCam
     VideoWebCam = False
 
@@ -48,6 +55,7 @@ def init():
 
     global Tiempo
     Tiempo = 0
+
     global nGalleta
     nGalleta = 0
     global flagfilas

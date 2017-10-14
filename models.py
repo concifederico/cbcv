@@ -12,8 +12,12 @@ class WebcamFeed(object):
     """ Starts a webcam feed """
     def __init__(self):
         self.webcam = cv2.VideoCapture(globvar.Dispositivo)
-        self.webcam.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, int(1280))
-        self.webcam.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, int(720))
+        if globvar.RPi == True:
+            self.webcam.set(cv2.CAP_PROP_FRAME_WIDTH, int(1280))
+            self.webcam.set(cv2.CV_CAP_PROP_FRAME_HEIGHT, int(720))
+        else:
+            self.webcam.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, int(1280))
+            self.webcam.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, int(720))
 		
     """ Determines if the webcam is available """
     def has_webcam(self):

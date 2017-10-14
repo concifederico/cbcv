@@ -5,6 +5,7 @@
 #
 
 import wx
+from wx import EmptyIcon
 import csv
 import os.path
 import numpy as np
@@ -22,6 +23,7 @@ from matplotlib.figure import Figure
 from matplotlib.dates import strpdate2num
 
 import wx.lib.mixins.inspection as WIT
+
 
 # begin wxGlade: dependencies
 # end wxGlade
@@ -146,12 +148,15 @@ class wxVideoFrame(wx.Frame):
                                           style=wx.SL_HORIZONTAL | wx.SL_LABELS | wx.SL_SELRANGE)  # Settings 18b
         self.notebook_7_pane_3 = wx.Panel(self.notebook_7, wx.ID_ANY)
         self.label_1 = wx.StaticText(self.notebook_7_pane_3, wx.ID_ANY, "Refresco del display (s)")
-        self.spin_button_display = wx.SpinButton(self.notebook_7_pane_3, wx.ID_ANY)  # Settings 19
+        self.spin_button_display = wx.SpinCtrl(self.notebook_7_pane_3, wx.ID_ANY, "", min=0, max=1800)  # Settings 19
         self.label_2 = wx.StaticText(self.notebook_7_pane_3, wx.ID_ANY, "Registro (ciclos de Refresco)")
-        self.spin_button_registro = wx.SpinButton(self.notebook_7_pane_3, wx.ID_ANY)  # Settings 20
+        self.spin_button_registro = wx.SpinCtrl(self.notebook_7_pane_3, wx.ID_ANY, "", min=0, max=100)  # Settings 20
         self.checkbox_csv = wx.CheckBox(self.notebook_7_pane_3, wx.ID_ANY, "CSV")  # Settings 21
-
         self.checkbox_AdvOverlay = wx.CheckBox(self.notebook_7_pane_3, wx.ID_ANY, "Ayudas visuales (Reducen rendimiento)")  # Settings 22
+
+        self.notebook_7_pane_4 =  wx.Panel(self.notebook_7, wx.ID_ANY)
+
+        self.spin_gamma_display = wx.SpinCtrl(self.notebook_7_pane_4, wx.ID_ANY, "", min=0, max=100)  # Settings 19
 
         self.notebook_5_pane_3 = wx.Panel(self.notebook_5, wx.ID_ANY)
         self.label_9 = wx.StaticText(self.notebook_5_pane_3, wx.ID_ANY, "cbcv v1\n\n 2017 - Federico S. Conci")
@@ -210,11 +215,6 @@ class wxVideoFrame(wx.Frame):
 
             self.combo_box_Objeto.SetValue(sf.readline()[:-1])  # Settings 11
 
-
-
-            globvar.LIE = 50
-            globvar.LSE = 58
-
             self.slider_hmin.SetValue(int(sf.readline()[:-1]))  # Settings 12
             self.slider_hmax.SetValue(int(sf.readline()[:-1]))  # Settings 13
             self.slider_smin.SetValue(int(sf.readline()[:-1]))  # Settings 14
@@ -224,7 +224,7 @@ class wxVideoFrame(wx.Frame):
             self.slider_desperado.SetValue(int(sf.readline()[:-1]))  # Settings 18
             self.slider_prefiltro.SetValue(int(sf.readline()[:-1]))  # Settings 18b
             self.spin_button_display.SetValue(int(sf.readline()[:-1]))  # Settings 19
-            self.spin_button_display.SetRange(1,1800)
+            #self.spin_button_display.SetRange(1,1800)
             self.spin_button_registro.SetValue(int(sf.readline()[:-1]))  # Settings 20
             self.checkbox_csv.SetValue(str2bool(sf.readline()[:-1]))  # Settings 21
             self.checkbox_AdvOverlay.SetValue(str2bool(sf.readline()[:-1]))  # Settings 22
@@ -332,7 +332,7 @@ class wxVideoFrame(wx.Frame):
 
     def __do_layout(self):
 
-        icon = wx.EmptyIcon()
+        icon = EmptyIcon()
         icon.CopyFromBitmap(wx.Bitmap("cbcv.png", wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
 
@@ -353,6 +353,7 @@ class wxVideoFrame(wx.Frame):
         grid_sizer_4 = wx.GridSizer(8, 2, 0, 0)
         grid_sizer_1 = wx.GridSizer(9, 2, 0, 0)
         grid_sizer_3 = wx.GridSizer(10, 2, 0, 0)
+        grid_sizer_5 = wx.GridSizer(10, 2, 0, 0)
         sizer_9 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_10 = wx.BoxSizer(wx.VERTICAL)
         grid_sizer_2 = wx.GridSizer(10, 2, 0, 0)
@@ -400,6 +401,9 @@ class wxVideoFrame(wx.Frame):
         grid_sizer_3.Add(self.radio_btn_1, 0, 0, 0)
         grid_sizer_3.Add(self.spin_ctrl_dispositivo, 0, wx.EXPAND, 0)
         grid_sizer_3.Add(self.radio_btn_2, 0, 0, 0)
+
+        grid_sizer_4.Add(self.spin_gamma_display, 0, 0, 0)
+
         sizer_10.Add(self.text_ctrl_archivo, 0, wx.EXPAND, 0)
         sizer_10.Add(self.button_2, 0, wx.EXPAND, 0)
         grid_sizer_3.Add(sizer_10, 1, wx.EXPAND, 0)
@@ -441,6 +445,7 @@ class wxVideoFrame(wx.Frame):
         grid_sizer_4.Add(self.checkbox_AdvOverlay, 0, 0, 0)
         self.notebook_7_pane_3.SetSizer(grid_sizer_4)
         self.notebook_7.AddPage(self.notebook_7_pane_1, "Sistema")
+        self.notebook_7.AddPage(self.notebook_7_pane_4, "Cámara")
         self.notebook_7.AddPage(self.notebook_7_pane_2, "Objeto")
         self.notebook_7.AddPage(self.notebook_7_pane_3, "Registro")
         sizer_4.Add(self.notebook_7, 1, wx.EXPAND, 0)

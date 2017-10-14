@@ -12,5 +12,6 @@ app = wx.App(False)
 frame = VideoFrame(None)
 
 frame.Maximize(True)
+#frame.ShowFullScreen(True)
 frame.Show()
 app.MainLoop()

@@ -14,7 +14,7 @@ class WebcamFeed(object):
         self.webcam = cv2.VideoCapture(globvar.Dispositivo)
         if globvar.RPi == True:
             self.webcam.set(cv2.CAP_PROP_FRAME_WIDTH, int(1280))
-            self.webcam.set(cv2.CV_CAP_PROP_FRAME_HEIGHT, int(720))
+            self.webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, int(720))
         else:
             self.webcam.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, int(1280))
             self.webcam.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, int(720))

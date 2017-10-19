@@ -231,20 +231,20 @@ def analizar(img, hmin, hmax, smin, smax, vmin, vmax, numfilas, DEsperado, Prefi
 
 	                # draw the midpoints on the img
 	            if AdvOverlay == True:
-	                if dA > dB:
-	                    cv2.circle(orig, (int(tltrX), int(tltrY)), 2, (255, 0, 255), -1)
-	                    cv2.circle(orig, (int(blbrX), int(blbrY)), 2, (255, 0, 255), -1)
+	                #if dA > dB:
+	                    #cv2.circle(orig, (int(tltrX), int(tltrY)), 2, (255, 0, 255), -1)
+	                    #cv2.circle(orig, (int(blbrX), int(blbrY)), 2, (255, 0, 255), -1)
 	                    cv2.line(orig, (int(tltrX), int(tltrY)), (int(blbrX), int(blbrY)), (0, 0, 255), 2)
-	                else:
-	                    cv2.circle(orig, (int(tlblX), int(tlblY)), 2, (255, 0, 255), -1)
-	                    cv2.circle(orig, (int(trbrX), int(trbrY)), 2, (255, 0, 255), -1)
-	                    cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)), (0, 0, 255), 2)
+	                #else:
+	                    #cv2.circle(orig, (int(tlblX), int(tlblY)), 2, (255, 0, 255), -1)
+	                    #cv2.circle(orig, (int(trbrX), int(trbrY)), 2, (255, 0, 255), -1)
+	                    cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)), (0, 255, 0), 2)
 
 	                # draw the object sizes on the img
 	                # cv2.putText(orig, "{:.0f}mm".format(dimD), (int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
 
     if AdvOverlay == True:
-        cv2.putText(orig, Texto, (int(100), int(20)), cv2.FONT_HERSHEY_SIMPLEX, .6, (255, 255, 255), 2)
+        cv2.putText(orig, Texto, (int(100), int(20)), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         cv2.line(orig, (int(DEsperado),int(0)), (int(DEsperado),int(height)), (127, 127, 255), 2)
         cv2.line(orig, (int(width - DEsperado),int(0)), (int(width - DEsperado), int(height)), (127, 127, 255), 2)
 

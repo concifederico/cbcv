@@ -14,6 +14,9 @@ def init():
 
     global VideoWebCam
     VideoWebCam = False
+    
+    global CD
+    CD = 10
 
     global TimerStatus
     TimerStatus = False

@@ -12,11 +12,14 @@ import time
 import csv
 import os
 
+
 from datetime import datetime, timedelta
 
 from monitor import analizar
 
 from models import WebcamFeed
+
+from subprocess import call
 
 """
 The Controller and View class.
@@ -75,7 +78,7 @@ class VideoFrame(gui.wxVideoFrame):
         if not self.state == self.STATE_CLOSING:
             self.state = self.STATE_CLOSING
             self.timer.Stop()
-            globvar.cap.release()
+            #globvar.cap.release()
             globvar.iniciovideo = False
             self.Destroy()
 
@@ -115,7 +118,15 @@ class VideoFrame(gui.wxVideoFrame):
 
             #cv2.rectangle(frame , (50, 25), (100, 50), (0, 0, 255), 15)
 
-            if globvar.inicioanalisis == True:
+	    if globvar.CD > 0:
+	        globvar.CD = globvar.CD - 1
+	        
+	    if globvar.CD == 2:
+	    	call(["v4l2-ctl", "-c", "exposure_auto=1"])
+	    	call(["v4l2-ctl", "-c", "exposure_absolute=250"])
+	    	call(["v4l2-ctl", "-c", "saturation=80"])
+	        
+            if globvar.inicioanalisis == True and globvar.CD == 0:
 
             	if globvar.Tiempo == 0:
             	    globvar.Tiempo = datetime.now().replace(microsecond=0)
